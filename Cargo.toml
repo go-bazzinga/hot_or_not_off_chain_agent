@@ -7,4 +7,13 @@ edition = "2021"
 
 [dependencies]
 axum = { git = "https://github.com/tokio-rs/axum" }
+candid = "0.9.3"
+rmp-serde = "1.1.2"
+serde = "1.0.183"
+sqlx = { version = "0.7.1", features = [
+    "runtime-tokio",
+    "tls-rustls",
+    "postgres",
+    "migrate",
+] }
 tokio = { version = "1.29.1", features = ["full"] }
