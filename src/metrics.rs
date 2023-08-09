@@ -1,8 +1,4 @@
-use axum::{
-    body::Bytes,
-    extract::State,
-    http::{status, StatusCode},
-};
+use axum::{body::Bytes, extract::State, http::StatusCode};
 use candid::Principal;
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -10,9 +6,9 @@ use sqlx::PgPool;
 #[derive(Deserialize, Debug)]
 pub struct CanisterStatus {
     pub canister_id: Principal,
-    cycle_balance: u128,
-    idle_cycles_burned_per_day: u128,
-    memory_consumed: u128,
+    cycle_balance: i64,
+    idle_cycles_burned_per_day: i64,
+    memory_size: i64,
 }
 
 #[derive(Deserialize, Debug)]
@@ -26,6 +22,8 @@ pub async fn receive_metrics(State(pool): State<PgPool>, body: Bytes) -> Result<
     // TODO: verify metric coming from a fleet canister
 
     let status = parse_metrics(body)?;
+
+    insert_value_to_database(status, State(pool)).await?;
 
     Ok(())
 }
@@ -49,4 +47,23 @@ fn parse_metrics(body: Bytes) -> Result<CanisterStatus, StatusCode> {
     Ok(status)
 }
 
-fn insert_values_to_database(canister_status: CanisterStatus) {}
+async fn insert_value_to_database(
+    canister_status: CanisterStatus,
+    pool: State<PgPool>,
+) -> Result<(), StatusCode> {
+    sqlx::query!(
+        r#"
+        insert into canister_metrics (canister_id, cycle_balance, idle_cycles_burned_per_day, memory_size)
+        VALUES ($1, $2, $3, $4)
+        "#,
+        canister_status.canister_id.to_text(),
+        canister_status.cycle_balance,
+        canister_status.idle_cycles_burned_per_day,
+        canister_status.memory_size
+    ).execute(&*pool).await.map_err(|e| {
+        println!("🛑 Failed to insert metrics: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    Ok(())
+}
