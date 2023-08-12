@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-docker run -d --name timescaledb -p 5432:5432 -e POSTGRES_PASSWORD=password timescale/timescaledb:latest-pg15
+docker run --detach --name timescaledb --publish 5432:5432 --env POSTGRES_PASSWORD=password --rm timescale/timescaledb:latest-pg15
+
+sqlx migrate run

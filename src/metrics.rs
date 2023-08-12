@@ -23,6 +23,8 @@ pub async fn receive_metrics(State(pool): State<PgPool>, body: Bytes) -> Result<
 
     let status = parse_metrics(body)?;
 
+    println!("✅ Received metrics: {:?}", status);
+
     insert_value_to_database(status, State(pool)).await?;
 
     Ok(())

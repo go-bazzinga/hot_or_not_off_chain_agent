@@ -17,16 +17,14 @@ async fn main() {
         .await
         .expect("🛑 Can't connect to database");
 
-    sqlx::migrate!()
-        .run(&pool)
-        .await
-        .expect("🛑 Can't run migrations");
-
     let app = Router::new()
         .route("/receive-metrics", routing::post(receive_metrics))
         .with_state(pool);
 
-    let listener = tokio::net::TcpListener::bind("localhost:3000")
+    let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+    let port = env::var("PORT").unwrap_or_else(|_| "3000".to_string());
+
+    let listener = tokio::net::TcpListener::bind(format!("{host}:{port}"))
         .await
         .unwrap();
 
