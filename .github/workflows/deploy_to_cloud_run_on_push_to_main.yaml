@@ -55,3 +55,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: "projects/431003668404/locations/global/workloadIdentityPools/receive-canister-metrics/attribute.repository/go-bazzinga/receive_canister_metrics_from_fleet_and_push_to_timeseries_database"
+          service_account: "github-action@hot-or-not-monitoring.iam.gserviceaccount.com"
