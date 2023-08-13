@@ -7,7 +7,8 @@ on:
 env:
   PROJECT_ID: hot-or-not-monitoring
   DEPLOY_REGION: us-central1
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: receive_canister_metrics_from_fleet_and_push_to_timeseries_database
+  SERVICE_NAME: receive-canister-metrics-and-push-to-timeseries-database
 
 jobs:
   deploy:
@@ -52,13 +53,13 @@ jobs:
           gcloud auth configure-docker ${{ env.DEPLOY_REGION }}-docker.pkg.dev
       - name: "Build and push container"
         run: |-
-          docker build . --tag ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker build . --tag ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
       # - name: Deploy to cloud run
       #   id: deploy
       #   uses: "google-github-actions/deploy-cloudrun@v1"
       #   with:
-      #     service: "receive-canister-metrics-and-push-to-timeseries-database"
+      #     service: ${{ env.SERVICE_NAME }}
       #     image: ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
       #     region: ${{ env.DEPLOY_REGION }}
       #     project_id: ${{ env.PROJECT_ID }}
