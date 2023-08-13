@@ -59,8 +59,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: "projects/431003668404/locations/global/workloadIdentityPools/receive-canister-metrics/providers/github-action"
-          service_account: "github-action@hot-or-not-monitoring.iam.gserviceaccount.com"
+          credentials_json: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT }}
       - name: Deploy to cloud run
         id: deploy
         uses: "google-github-actions/deploy-cloudrun@v1"
