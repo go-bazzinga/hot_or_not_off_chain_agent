@@ -5,7 +5,8 @@ on:
       - main
 
 env:
-  REGISTRY: ghcr.io
+  PROJECT_ID: hot-or-not-monitoring
+  DEPLOY_REGION: us-central1
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -38,35 +39,28 @@ jobs:
         run: nix-shell --run 'cargo build --release --target x86_64-unknown-linux-musl'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT }}
-      - name: Deploy to cloud run
-        id: deploy
-        uses: "google-github-actions/deploy-cloudrun@v1"
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          service: "receive-canister-metrics-and-push-to-timeseries-database"
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          region: "us-central1"
-          project_id: "hot-or-not-monitoring"
-          env_vars: |
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+          project_id: ${{ env.PROJECT_ID }}
+      - name: Docker auth
+        run: |-
+          gcloud auth configure-docker ${{ env.DEPLOY_REGION }}-docker.pkg.dev
+      - name: "Build and push container"
+        run: |-
+          docker build . --tag ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+      # - name: Deploy to cloud run
+      #   id: deploy
+      #   uses: "google-github-actions/deploy-cloudrun@v1"
+      #   with:
+      #     service: "receive-canister-metrics-and-push-to-timeseries-database"
+      #     image: ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+      #     region: ${{ env.DEPLOY_REGION }}
+      #     project_id: ${{ env.PROJECT_ID }}
+      #     env_vars: |
+      #       DATABASE_URL=${{ secrets.DATABASE_URL }}
