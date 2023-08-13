@@ -8,11 +8,13 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    # env:
+    #   NIXPKGS_ALLOW_UNFREE: 1
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Cache install Nix packages
-        uses: rikhuijzer/cache-install@v1.0.9
+        uses: rikhuijzer/cache-install@v1.1.1
         with:
           key: nix-${{ hashFiles('ci.nix') }}
           nix_file: "ci.nix"
@@ -27,8 +29,6 @@ jobs:
             target/
           key: rust-${{ hashFiles('**/Cargo.lock') }}
       - name: Run database migrations
-        run: nix-shell --run 'sqlx migrate run'
+        run: sqlx migrate run
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    env:
-      NIXPKGS_ALLOW_UNFREE: 1
