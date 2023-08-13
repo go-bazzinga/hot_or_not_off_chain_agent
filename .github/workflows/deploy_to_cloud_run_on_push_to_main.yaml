@@ -27,3 +27,8 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: rust-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run database migrations
+        run: |
+          nix-shell --run 'sqlx migrate run'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
