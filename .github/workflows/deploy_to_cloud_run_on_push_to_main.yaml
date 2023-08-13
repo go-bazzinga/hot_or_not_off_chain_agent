@@ -15,3 +15,5 @@ jobs:
         uses: rikhuijzer/cache-install@v1.0.9
         with:
           key: nix-${{ hashFiles('default.nix') }}
+        env:
+          NIXPKGS_ALLOW_UNFREE: 1
