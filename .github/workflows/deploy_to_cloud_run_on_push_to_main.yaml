@@ -14,10 +14,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Cache install Nix packages
-        uses: rikhuijzer/cache-install@v1.0.9
-        with:
-          key: nix-${{ hashFiles('default.nix') }}
-          nix_file: "default.nix"
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Cache rust dependencies and build output
         uses: actions/cache@v3
         with:
@@ -34,3 +31,5 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Build Rust project to `musl` output
         run: nix-shell --run 'cargo build --release --target x86_64-unknown-linux-musl'
+        # env:
+        #   DATABASE_URL: ${{ secrets.DATABASE_URL }}
