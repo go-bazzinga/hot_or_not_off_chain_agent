@@ -8,16 +8,16 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # env:
-    #   NIXPKGS_ALLOW_UNFREE: 1
+    env:
+      NIXPKGS_ALLOW_UNFREE: 1
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Cache install Nix packages
         uses: rikhuijzer/cache-install@v1.1.1
         with:
-          key: nix-${{ hashFiles('ci.nix') }}
-          nix_file: "ci.nix"
+          key: nix-${{ hashFiles('default.nix') }}
+          nix_file: "default.nix"
       - name: Cache rust dependencies and build output
         uses: actions/cache@v3
         with:

@@ -7,9 +7,9 @@ in
 pkgs.mkShell {
   buildInputs = with pkgs; [
     rustup
-    cargo-watch
+    # cargo-watch
     google-cloud-sdk
-    ngrok
+    # ngrok
     sqlx-cli
   ];
 }
