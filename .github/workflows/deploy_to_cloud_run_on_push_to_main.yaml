@@ -55,13 +55,14 @@ jobs:
         run: |-
           docker build . --tag ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-      # - name: Deploy to cloud run
-      #   id: deploy
-      #   uses: "google-github-actions/deploy-cloudrun@v1"
-      #   with:
-      #     service: ${{ env.SERVICE_NAME }}
-      #     image: ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-      #     region: ${{ env.DEPLOY_REGION }}
-      #     project_id: ${{ env.PROJECT_ID }}
-      #     env_vars: |
-      #       DATABASE_URL=${{ secrets.DATABASE_URL }}
+      - name: Deploy to cloud run
+        id: deploy
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          region: ${{ env.DEPLOY_REGION }}
+          project_id: ${{ env.PROJECT_ID }}
+          flags: "--allow-unauthenticated"
+          env_vars: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
