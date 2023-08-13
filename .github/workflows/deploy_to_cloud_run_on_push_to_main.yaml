@@ -61,3 +61,9 @@ jobs:
         with:
           workload_identity_provider: "projects/431003668404/locations/global/workloadIdentityPools/receive-canister-metrics/providers/github-action"
           service_account: "github-action@hot-or-not-monitoring.iam.gserviceaccount.com"
+      - name: Deploy to cloud run
+        id: deploy
+        uses: "google-github-actions/deploy-cloudrun@v1"
+        with:
+          service: "receive-canister-metrics-and-push-to-timeseries-database"
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
