@@ -67,3 +67,5 @@ jobs:
         with:
           service: "receive-canister-metrics-and-push-to-timeseries-database"
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          secrets: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
