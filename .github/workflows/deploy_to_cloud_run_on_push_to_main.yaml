@@ -8,8 +8,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    env:
-      NIXPKGS_ALLOW_UNFREE: 1
+    # env:
+    #   NIXPKGS_ALLOW_UNFREE: 1
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
