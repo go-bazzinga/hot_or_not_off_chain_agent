@@ -4,12 +4,17 @@ on:
     branches:
       - main
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # env:
-    #   NIXPKGS_ALLOW_UNFREE: 1
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -21,12 +26,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/x86_64-unknown-linux-musl/release/
-          key: rust-${{ hashFiles('**/Cargo.lock') }}
+            ~/.cargo/
+            target/
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Run database migrations
         run: nix-shell --run 'sqlx migrate run'
         env:
@@ -35,3 +37,21 @@ jobs:
         run: nix-shell --run 'cargo build --release --target x86_64-unknown-linux-musl'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
