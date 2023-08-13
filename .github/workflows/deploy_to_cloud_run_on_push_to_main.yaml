@@ -30,3 +30,5 @@ jobs:
         run: nix-shell --run 'sqlx migrate run'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    env:
+      NIXPKGS_ALLOW_UNFREE: 1
