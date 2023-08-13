@@ -31,5 +31,5 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Build Rust project to `musl` output
         run: nix-shell --run 'cargo build --release --target x86_64-unknown-linux-musl'
-        # env:
-        #   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
