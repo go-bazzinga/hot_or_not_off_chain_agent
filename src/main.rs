@@ -12,7 +12,7 @@ async fn main() {
         env::var("DATABASE_URL").expect("🛑 DATABASE_URL environment variable is not set");
 
     let pool = PgPoolOptions::new()
-        .max_connections(5)
+        .max_connections(25)
         .connect(&database_url)
         .await
         .expect("🛑 Can't connect to database");
