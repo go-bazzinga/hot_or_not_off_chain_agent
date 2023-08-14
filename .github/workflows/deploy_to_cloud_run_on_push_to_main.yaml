@@ -63,6 +63,6 @@ jobs:
           image: ${{ env.DEPLOY_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           region: ${{ env.DEPLOY_REGION }}
           project_id: ${{ env.PROJECT_ID }}
-          flags: "--allow-unauthenticated"
+          flags: "--allow-unauthenticated --max-instances=1 --cpu=4 --memory=4Gi --concurrency=1000"
           env_vars: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
