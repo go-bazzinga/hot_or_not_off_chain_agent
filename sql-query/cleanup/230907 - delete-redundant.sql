@@ -22,4 +22,7 @@ from canister_metrics;
 -- 18th - 52099736
 -- 17th - 52623515
 delete from canister_metrics
-where date(recorded_at) = '2023-09-02';
+where date(recorded_at) <= '2023-09-20';
+
+select distinct(date(recorded_at))
+from canister_metrics;
